@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoPower - Arquitetura do Ecossistema</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --bg-card-hover: #222240;
+            --accent-green: #00e676;
+            --accent-blue: #448aff;
+            --accent-purple: #7c4dff;
+            --accent-orange: #ff9100;
+            --accent-pink: #ff4081;
+            --accent-cyan: #18ffff;
+            --accent-yellow: #ffea00;
+            --text-primary: #e8e8f0;
+            --text-secondary: #9090a8;
+            --text-muted: #606078;
+            --border: #2a2a40;
+            --glow-green: rgba(0, 230, 118, 0.15);
+            --glow-blue: rgba(68, 138, 255, 0.15);
+            --glow-purple: rgba(124, 77, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Slide System */
+        .slide {
+            min-height: 100vh;
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(124, 77, 255, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 230, 118, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(68, 138, 255, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .slide-number {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            height: 56px;
+            gap: 32px;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 18px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* ===== SLIDE 1: HERO ===== */
+        .hero-slide {
+            text-align: center;
+            align-items: center;
+            padding-top: 100px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 230, 118, 0.08);
+            border: 1px solid rgba(0, 230, 118, 0.2);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 13px;
+            color: var(--accent-green);
+            font-weight: 500;
+            margin-bottom: 32px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero-title {
+            font-size: 72px;
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -3px;
+            margin-bottom: 24px;
+        }
+
+        .hero-title .gradient {
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-cyan) 50%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.6;
+            font-weight: 400;
+            margin-bottom: 48px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            margin-top: 20px;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .hero-stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== SLIDE 2: OVERVIEW DIAGRAM ===== */
+        .ecosystem-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .layer {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 32px;
+            position: relative;
+            transition: all 0.3s;
+            background: var(--bg-card);
+        }
+
+        .layer:hover {
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .layer-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .layer-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .layer-icon.green { background: var(--glow-green); }
+        .layer-icon.blue { background: var(--glow-blue); }
+        .layer-icon.purple { background: var(--glow-purple); }
+        .layer-icon.orange { background: rgba(255, 145, 0, 0.15); }
+        .layer-icon.pink { background: rgba(255, 64, 129, 0.15); }
+
+        .layer-name {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .layer-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            margin-left: auto;
+        }
+
+        .tag-mobile { background: rgba(0, 230, 118, 0.12); color: var(--accent-green); }
+        .tag-backend { background: rgba(68, 138, 255, 0.12); color: var(--accent-blue); }
+        .tag-web { background: rgba(124, 77, 255, 0.12); color: var(--accent-purple); }
+        .tag-iot { background: rgba(255, 145, 0, 0.12); color: var(--accent-orange); }
+        .tag-data { background: rgba(255, 64, 129, 0.12); color: var(--accent-pink); }
+
+        .layer-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .layer-techs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .tech-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: var(--text-secondary);
+        }
+
+        /* Connection Arrows */
+        .connection-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 8px 0;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .connection-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .arrow-line {
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to bottom, var(--accent-green), var(--accent-blue));
+            border-radius: 1px;
+        }
+
+        .arrow-label {
+            padding: 4px 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* ===== SLIDE 3: DETAILED LAYERS ===== */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .detail-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s;
+        }
+
+        .detail-card:hover {
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .detail-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .detail-card-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .detail-card-emoji {
+            font-size: 24px;
+        }
+
+        .file-tree {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 2;
+            color: var(--text-secondary);
+            background: rgba(0,0,0,0.2);
+            padding: 20px 24px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.03);
+            overflow-x: auto;
+        }
+
+        .file-tree .folder { color: var(--accent-blue); font-weight: 600; }
+        .file-tree .file { color: var(--text-secondary); }
+        .file-tree .comment { color: var(--text-muted); font-style: italic; }
+        .file-tree .highlight { color: var(--accent-green); font-weight: 500; }
+
+        /* ===== SLIDE 4: FLOW DIAGRAM ===== */
+        .flow-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .flow-line {
+            position: absolute;
+            left: 23px;
+            top: 48px;
+            width: 2px;
+            height: calc(100% + 8px);
+            background: linear-gradient(to bottom, var(--border), transparent);
+        }
+
+        .flow-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .flow-content {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        .flow-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .flow-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .flow-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            background: rgba(0,0,0,0.3);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            color: var(--accent-cyan);
+            border: 1px solid rgba(255,255,255,0.03);
+            overflow-x: auto;
+        }
+
+        /* ===== SLIDE 5: DATABASE ===== */
+        .db-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .db-table {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .db-table:hover {
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .db-table-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 16px 20px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .db-table-name .icon {
+            font-size: 16px;
+        }
+
+        .db-columns {
+            padding: 12px 20px 16px;
+        }
+
+        .db-col {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .db-col .type {
+            color: var(--text-muted);
+            margin-left: auto;
+            font-size: 10px;
+        }
+
+        .db-col .pk { color: var(--accent-yellow); font-weight: 600; }
+        .db-col .fk { color: var(--accent-blue); font-weight: 600; }
+        .db-col .name { color: var(--text-secondary); }
+
+        .db-col-icon {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .db-col-icon.pk-icon { background: var(--accent-yellow); }
+        .db-col-icon.fk-icon { background: var(--accent-blue); }
+        .db-col-icon.col-icon { background: var(--text-muted); }
+
+        /* ===== SLIDE 6: TECH STACK ===== */
+        .stack-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .stack-category {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .stack-category:hover {
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .stack-cat-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .stack-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .stack-item-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .stack-item-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .stack-item-ver {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        /* ===== SLIDE 7: AUTH FLOW ===== */
+        .auth-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .auth-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .auth-panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auth-step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .auth-step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+        }
+
+        .auth-step-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            padding-top: 4px;
+        }
+
+        .auth-step-text strong {
+            color: var(--text-primary);
+        }
+
+        /* ===== SLIDE 8: OCPP PROTOCOL ===== */
+        .ocpp-flow {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .ocpp-columns {
+            display: grid;
+            grid-template-columns: 1fr 200px 1fr;
+            gap: 0;
+            margin-top: 24px;
+        }
+
+        .ocpp-entity {
+            text-align: center;
+            padding: 16px;
+            font-weight: 700;
+            font-size: 14px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .ocpp-entity.charger { color: var(--accent-orange); }
+        .ocpp-entity.server { color: var(--accent-blue); }
+        .ocpp-entity.middle { color: var(--text-muted); font-size: 12px; font-weight: 400; }
+
+        .ocpp-message {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            gap: 0;
+        }
+
+        .ocpp-msg-left, .ocpp-msg-right {
+            flex: 1;
+        }
+
+        .ocpp-msg-center {
+            width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .ocpp-msg-arrow {
+            width: 100%;
+            height: 2px;
+            position: relative;
+        }
+
+        .ocpp-msg-arrow.right {
+            background: linear-gradient(to right, var(--accent-orange), var(--accent-blue));
+        }
+
+        .ocpp-msg-arrow.left {
+            background: linear-gradient(to left, var(--accent-orange), var(--accent-blue));
+        }
+
+        .ocpp-msg-arrow::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .ocpp-msg-arrow.right::after {
+            right: 0;
+            border-left: 8px solid var(--accent-blue);
+        }
+
+        .ocpp-msg-arrow.left::after {
+            left: 0;
+            border-right: 8px solid var(--accent-orange);
+        }
+
+        .ocpp-msg-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .ocpp-msg-left .ocpp-msg-label {
+            text-align: right;
+            background: rgba(255, 145, 0, 0.08);
+            color: var(--accent-orange);
+            margin-left: auto;
+        }
+
+        .ocpp-msg-right .ocpp-msg-label {
+            text-align: left;
+            background: rgba(68, 138, 255, 0.08);
+            color: var(--accent-blue);
+        }
+
+        .ocpp-msg-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ===== SLIDE 9: SOCKET EVENTS ===== */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .event-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .event-card:hover {
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .event-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .event-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .event-direction {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .event-direction.server { color: var(--accent-blue); }
+        .event-direction.broadcast { color: var(--accent-green); }
+
+        /* ===== FOOTER ===== */
+        .slide-footer {
+            position: absolute;
+            bottom: 30px;
+            left: 80px;
+            right: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Separator */
+        .separator {
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border), transparent);
+            margin: 0 80px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide { padding: 40px 24px; }
+            .hero-title { font-size: 42px; }
+            .detail-grid, .auth-grid { grid-template-columns: 1fr; }
+            .db-grid { grid-template-columns: 1fr 1fr; }
+            .stack-grid { grid-template-columns: 1fr 1fr; }
+            .events-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .ocpp-columns { grid-template-columns: 1fr; }
+        }
+
+        /* Smooth scroll */
+        html { scroll-behavior: smooth; }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav-bar">
+    <div class="nav-logo">NeoPower</div>
+    <div class="nav-links">
+        <a href="#hero" class="active">Inicio</a>
+        <a href="#overview">Visao Geral</a>
+        <a href="#mobile">Mobile</a>
+        <a href="#backend">Backend</a>
+        <a href="#ocpp">OCPP</a>
+        <a href="#database">Database</a>
+        <a href="#auth">Auth</a>
+        <a href="#realtime">Real-time</a>
+        <a href="#stack">Stack</a>
+    </div>
+</nav>
+
+<!-- ===== SLIDE 1: HERO ===== -->
+<section class="slide hero-slide" id="hero">
+    <div class="slide-number">01 / 09</div>
+    <div class="hero-badge">Arquitetura de Software</div>
+    <h1 class="hero-title">
+        <span class="gradient">NeoPower</span><br>
+        Ecossistema
+    </h1>
+    <p class="hero-subtitle">
+        Plataforma completa para gerenciamento de recarga de veiculos eletricos com OCPP 1.6J,
+        monitoramento em tempo real e aplicativo mobile.
+    </p>
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <div class="hero-stat-value">5</div>
+            <div class="hero-stat-label">Aplicacoes</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-value">3</div>
+            <div class="hero-stat-label">Camadas</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-value">OCPP 1.6J</div>
+            <div class="hero-stat-label">Protocolo</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-value">Real-time</div>
+            <div class="hero-stat-label">Socket.IO</div>
+        </div>
+    </div>
+</section>
+
+<div class="separator"></div>
+
+<!-- ===== SLIDE 2: VISAO GERAL ===== -->
+<section class="slide" id="overview">
+    <div class="slide-number">02 / 09</div>
+    <h2 class="section-title">Visao Geral do Ecossistema</h2>
+    <p class="section-subtitle">Arquitetura em camadas com comunicacao bidirecional via REST, WebSocket e OCPP</p>
+
+    <div class="ecosystem-grid">
+        <!-- Camada 1: Clientes -->
+        <div class="layer fade-in" style="border-left: 3px solid var(--accent-green);">
+            <div class="layer-header">
+                <div class="layer-icon green">&#9889;</div>
+                <div>
+                    <div class="layer-name">Camada de Apresentacao</div>
+                    <div style="font-size:12px; color: var(--text-muted);">Frontend &mdash; Clientes</div>
+                </div>
+                <span class="layer-tag tag-mobile">CLIENTES</span>
+            </div>
+            <div class="layer-desc">
+                <strong>NeoPower App</strong> (React Native/Expo) &mdash; App mobile para usuarios finais: login, busca de estacoes, iniciar/parar recarga, carteira, historico.<br>
+                <strong>NeoRBAC Dashboard</strong> (React/Vite) &mdash; Painel administrativo web: monitoramento de carregadores, gestao de usuarios, financeiro, vouchers, notificacoes push.
+            </div>
+            <div class="layer-techs">
+                <span class="tech-pill">React Native 0.81</span>
+                <span class="tech-pill">Expo 54</span>
+                <span class="tech-pill">React 18</span>
+                <span class="tech-pill">Vite 7</span>
+                <span class="tech-pill">Tailwind CSS</span>
+                <span class="tech-pill">Socket.IO Client</span>
+                <span class="tech-pill">Axios</span>
+                <span class="tech-pill">Leaflet Maps</span>
+            </div>
+        </div>
+
+        <!-- Connection -->
+        <div class="connection-row">
+            <div class="connection-arrow">
+                <div class="arrow-line"></div>
+            </div>
+            <span class="arrow-label">REST API (HTTPS) + Socket.IO (WSS)</span>
+            <div class="connection-arrow">
+                <div class="arrow-line"></div>
+            </div>
+        </div>
+
+        <!-- Camada 2: Backend -->
+        <div class="layer fade-in" style="border-left: 3px solid var(--accent-blue);">
+            <div class="layer-header">
+                <div class="layer-icon blue">&#9881;</div>
+                <div>
+                    <div class="layer-name">Camada de Negocio</div>
+                    <div style="font-size:12px; color: var(--text-muted);">Backend &mdash; API + OCPP Server</div>
+                </div>
+                <span class="layer-tag tag-backend">SERVIDOR</span>
+            </div>
+            <div class="layer-desc">
+                <strong>OCPP_API</strong> (Express 5 + Node.js) &mdash; API REST central que gerencia toda a logica de negocio: autenticacao JWT, controle de carregadores, transacoes,
+                carteiras, pagamentos (MercadoPago), notificacoes push, e servidor OCPP 1.6J integrado para comunicacao com carregadores fisicos.<br>
+                <strong>base_ocpp</strong> &mdash; CSMS alternativo standalone com seguranca avancada (TLS/mTLS, Security Profiles 0-3) e frontend proprio estilo SteVe.
+            </div>
+            <div class="layer-techs">
+                <span class="tech-pill">Express 5</span>
+                <span class="tech-pill">TypeORM 0.3</span>
+                <span class="tech-pill">Socket.IO Server</span>
+                <span class="tech-pill">ocpp-rpc 2.2</span>
+                <span class="tech-pill">JWT</span>
+                <span class="tech-pill">Zod</span>
+                <span class="tech-pill">Winston</span>
+                <span class="tech-pill">MercadoPago SDK</span>
+            </div>
+        </div>
+
+        <!-- Connection -->
+        <div class="connection-row">
+            <div class="connection-arrow">
+                <div class="arrow-line"></div>
+            </div>
+            <span class="arrow-label">TypeORM / SQL</span>
+            <div class="connection-arrow">
+                <div class="arrow-line"></div>
+            </div>
+            <span class="arrow-label" style="margin-left: 40px;">OCPP 1.6J (WebSocket)</span>
+            <div class="connection-arrow">
+                <div class="arrow-line"></div>
+            </div>
+        </div>
+
+        <!-- Camada 3: Dados + IoT -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div class="layer fade-in" style="border-left: 3px solid var(--accent-pink);">
+                <div class="layer-header">
+                    <div class="layer-icon pink">&#128451;</div>
+                    <div>
+                        <div class="layer-name">Camada de Dados</div>
+                        <div style="font-size:12px; color: var(--text-muted);">Persistencia</div>
+                    </div>
+                    <span class="layer-tag tag-data">DATABASE</span>
+                </div>
+                <div class="layer-desc">
+                    <strong>PostgreSQL 14+</strong> &mdash; Banco relacional com entidades: users, wallets, charge_points, transactions, locations, vehicles, vouchers, notifications. Gerenciado pelo TypeORM com migrations.
+                </div>
+                <div class="layer-techs">
+                    <span class="tech-pill">PostgreSQL 14+</span>
+                    <span class="tech-pill">TypeORM Migrations</span>
+                    <span class="tech-pill">Connection Pooling</span>
+                </div>
+            </div>
+
+            <div class="layer fade-in" style="border-left: 3px solid var(--accent-orange);">
+                <div class="layer-header">
+                    <div class="layer-icon orange">&#128268;</div>
+                    <div>
+                        <div class="layer-name">Camada IoT</div>
+                        <div style="font-size:12px; color: var(--text-muted);">Carregadores Fisicos</div>
+                    </div>
+                    <span class="layer-tag tag-iot">HARDWARE</span>
+                </div>
+                <div class="layer-desc">
+                    <strong>Estacoes de Recarga EV</strong> &mdash; Carregadores fisicos que se conectam via protocolo OCPP 1.6J (WebSocket). Enviam BootNotification, MeterValues a cada 30-60s, e respondem a comandos remotos (RemoteStart/Stop).
+                </div>
+                <div class="layer-techs">
+                    <span class="tech-pill">OCPP 1.6J</span>
+                    <span class="tech-pill">WebSocket</span>
+                    <span class="tech-pill">JSON/SOAP</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="separator"></div>
+
+<!-- ===== SLIDE 3: MOBILE APP ===== -->
+<section class="slide" id="mobile">
+    <div class="slide-number">03 / 09</div>
+    <h2 class="section-title">NeoPower Mobile App</h2>
+    <p class="section-subtitle">Aplicativo React Native/Expo para usuarios finais de recarga de veiculos eletricos</p>
+
+    <div class="detail-grid">
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <span class="detail-card-emoji">&#128193;</span>
+                <span class="detail-card-title">Estrutura do Projeto</span>
+            </div>
+            <div class="file-tree">
+<span class="folder">NeoPower/src/</span>
+<span class="folder">  config/</span>
+<span class="file">    index.ts</span> <span class="comment">  # API_URL, SOCKET_URL, MOCK_MODE</span>
+<span class="folder">  contexts/</span>
+<span class="highlight">    AuthContext.tsx</span> <span class="comment"># Estado de autenticacao</span>
+<span class="highlight">    AppContext.tsx</span> <span class="comment"> # Estado global (wallet, stations)</span>
+<span class="folder">  services/</span> <span class="comment">        # Singletons de servico</span>
+<span class="file">    api.ts</span> <span class="comment">        # Axios + interceptors</span>
+<span class="file">    auth.ts</span> <span class="comment">       # Google OAuth + JWT</span>
+<span class="file">    socket.ts</span> <span class="comment">     # Socket.IO client</span>
+<span class="file">    stations.ts</span> <span class="comment">   # Estacoes de recarga</span>
+<span class="file">    wallet.ts</span> <span class="comment">     # Saldo e depositos</span>
+<span class="file">    vehicles.ts</span> <span class="comment">   # Veiculos do usuario</span>
+<span class="file">    mercadopago.ts</span> <span class="comment"># Pagamentos PIX/cartao</span>
+<span class="folder">  screens/</span> <span class="comment">         # 15+ telas</span>
+<span class="folder">  components/</span> <span class="comment">      # Componentes reutilizaveis</span>
+<span class="folder">  navigation/</span> <span class="comment">      # React Navigation 7</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <span class="detail-card-emoji">&#128241;</span>
+                <span class="detail-card-title">Telas Principais</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="background: rgba(0,230,118,0.05); border: 1px solid rgba(0,230,118,0.1); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Login</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Google OAuth + Onboarding</div>
+                </div>
+                <div style="background: rgba(68,138,255,0.05); border: 1px solid rgba(68,138,255,0.1); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Home</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Dashboard + Estacoes proximas</div>
+                </div>
+                <div style="background: rgba(124,77,255,0.05); border: 1px solid rgba(124,77,255,0.1); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Mapa</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Estacoes no mapa interativo</div>
+                </div>
+                <div style="background: rgba(255,145,0,0.05); border: 1px solid rgba(255,145,0,0.1); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Recarga</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Monitoramento em tempo real</div>
+                </div>
+                <div style="background: rgba(255,64,129,0.05); border: 1px solid rgba(255,64,129,0.1); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Carteira</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Saldo + Depositos PIX</div>
+                </div>
+                <div style="background: rgba(24,255,255,0.05); border: 1px solid rgba(24,255,255,0.1); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Historico</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Transacoes de recarga</div>
+                </div>
+                <div style="background: rgba(255,234,0,0.05); border: 1px solid rgba(255,234,0,0.1); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">QR Code</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Scan para ativar carregador</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Perfil</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Dados + Veiculos + Config</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-card full-width">
+            <div class="detail-card-header">
+                <span class="detail-card-emoji">&#128260;</span>
+                <span class="detail-card-title">Padrao de Comunicacao - Services Layer</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; text-align: center;">
+                <div style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 16px;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--accent-green); margin-bottom: 8px;">Screen</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Tela React Native chama context</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 16px;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--accent-blue); margin-bottom: 8px;">Context</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">AuthContext / AppContext gerencia estado</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 16px;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--accent-purple); margin-bottom: 8px;">Service</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Singleton faz chamada HTTP/WS</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 16px;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--accent-orange); margin-bottom: 8px;">API</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Axios com auto-refresh de token</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="separator"></div>
+
+<!-- ===== SLIDE 4: BACKEND ===== -->
+<section class="slide" id="backend">
+    <div class="slide-number">04 / 09</div>
+    <h2 class="section-title">OCPP_API &mdash; Backend Central</h2>
+    <p class="section-subtitle">Express 5 + Node.js: REST API, OCPP Server, Socket.IO, Pagamentos, Notificacoes</p>
+
+    <div class="detail-grid">
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <span class="detail-card-emoji">&#128193;</span>
+                <span class="detail-card-title">Estrutura do Backend</span>
+            </div>
+            <div class="file-tree">
+<span class="folder">OCPP_API/src/</span>
+<span class="folder">  controllers/</span> <span class="comment">    # Handlers HTTP</span>
+<span class="file">    userController.ts</span> <span class="comment">     # Auth, wallet, perfil</span>
+<span class="file">    chargersController.ts</span> <span class="comment">  # Operacoes carregador</span>
+<span class="file">    commandsController.ts</span> <span class="comment">  # RemoteStart/Stop</span>
+<span class="file">    transactionsController.ts</span>
+<span class="file">    vouchersController.ts</span>
+<span class="file">    mercadoPagoController.ts</span> <span class="comment"># Pagamentos</span>
+<span class="folder">  middleware/</span>
+<span class="highlight">    authMiddleware.ts</span> <span class="comment">     # JWT + RBAC</span>
+<span class="file">    validationMiddleware.ts</span>
+<span class="file">    errorMiddleware.ts</span>
+<span class="folder">  models/</span> <span class="comment">              # TypeORM entities</span>
+<span class="folder">  ocpp/</span>
+<span class="highlight">    ocppServer.ts</span> <span class="comment">  # OCPP 1.6J WebSocket</span>
+<span class="folder">  services/</span>
+<span class="file">    socketService.ts</span> <span class="comment">      # Socket.IO broadcast</span>
+<span class="file">    expoPushService.ts</span> <span class="comment">    # Push notifications</span>
+<span class="folder">  validators/</span>
+<span class="file">    schemas.ts</span> <span class="comment">            # Zod schemas</span>
+<span class="folder">  routes/</span>
+<span class="file">    api.ts</span> <span class="comment">                # Todas as rotas</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <span class="detail-card-emoji">&#128279;</span>
+                <span class="detail-card-title">Endpoints REST Principais</span>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 2.2;">
+                <div><span style="color: var(--accent-green); font-weight: 600;">POST</span> <span style="color: var(--text-secondary);">/users/register</span></div>
+                <div><span style="color: var(--accent-green); font-weight: 600;">POST</span> <span style="color: var(--text-secondary);">/users/login</span></div>
+                <div><span style="color: var(--accent-green); font-weight: 600;">POST</span> <span style="color: var(--text-secondary);">/users/google-auth</span></div>
+                <div><span style="color: var(--accent-blue); font-weight: 600;">GET&nbsp;</span> <span style="color: var(--text-secondary);">/chargers/all</span></div>
+                <div><span style="color: var(--accent-blue); font-weight: 600;">GET&nbsp;</span> <span style="color: var(--text-secondary);">/chargers/:id</span></div>
+                <div><span style="color: var(--accent-orange); font-weight: 600;">POST</span> <span style="color: var(--text-secondary);">/commands/remote-start</span></div>
+                <div><span style="color: var(--accent-orange); font-weight: 600;">POST</span> <span style="color: var(--text-secondary);">/commands/remote-stop</span></div>
+                <div><span style="color: var(--accent-blue); font-weight: 600;">GET&nbsp;</span> <span style="color: var(--text-secondary);">/transactions/all</span></div>
+                <div><span style="color: var(--accent-blue); font-weight: 600;">GET&nbsp;</span> <span style="color: var(--text-secondary);">/wallets/balance</span></div>
+                <div><span style="color: var(--accent-green); font-weight: 600;">POST</span> <span style="color: var(--text-secondary);">/wallets/deposit</span></div>
+                <div><span style="color: var(--accent-green); font-weight: 600;">POST</span> <span style="color: var(--text-secondary);">/vouchers/redeem</span></div>
+                <div><span style="color: var(--accent-blue); font-weight: 600;">GET&nbsp;</span> <span style="color: var(--text-secondary);">/locations</span></div>
+            </div>
+        </div>
+
+        <div class="detail-card full-width">
+            <div class="detail-card-header">
+                <span class="detail-card-emoji">&#9881;</span>
+                <span class="detail-card-title">Middleware Pipeline</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                <div style="background: rgba(255,145,0,0.08); border: 1px solid rgba(255,145,0,0.15); border-radius: 10px; padding: 14px 20px; text-align: center;">
+                    <div style="font-size: 13px; font-weight: 600; color: var(--accent-orange);">Request</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">HTTP / WS</div>
+                </div>
+                <div style="color: var(--text-muted);">&#8594;</div>
+                <div style="background: rgba(255,64,129,0.08); border: 1px solid rgba(255,64,129,0.15); border-radius: 10px; padding: 14px 20px; text-align: center;">
+                    <div style="font-size: 13px; font-weight: 600; color: var(--accent-pink);">Validation</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Zod Schemas</div>
+                </div>
+                <div style="color: var(--text-muted);">&#8594;</div>
+                <div style="background: rgba(124,77,255,0.08); border: 1px solid rgba(124,77,255,0.15); border-radius: 10px; padding: 14px 20px; text-align: center;">
+                    <div style="font-size: 13px; font-weight: 600; color: var(--accent-purple);">Auth</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">JWT + RBAC</div>
+                </div>
+                <div style="color: var(--text-muted);">&#8594;</div>
+                <div style="background: rgba(68,138,255,0.08); border: 1px solid rgba(68,138,255,0.15); border-radius: 10px; padding: 14px 20px; text-align: center;">
+                    <div style="font-size: 13px; font-weight: 600; color: var(--accent-blue);">Controller</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Business Logic</div>
+                </div>
+                <div style="color: var(--text-muted);">&#8594;</div>
+                <div style="background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.15); border-radius: 10px; padding: 14px 20px; text-align: center;">
+                    <div style="font-size: 13px; font-weight: 600; color: var(--accent-green);">Response</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">JSON + Events</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="separator"></div>
+
+<!-- ===== SLIDE 5: OCPP PROTOCOL ===== -->
+<section class="slide" id="ocpp">
+    <div class="slide-number">05 / 09</div>
+    <h2 class="section-title">Protocolo OCPP 1.6J</h2>
+    <p class="section-subtitle">Comunicacao bidirecional entre carregadores fisicos e o servidor central (CSMS)</p>
+
+    <div class="ocpp-flow">
+        <div style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; max-width: 800px; margin: 0 auto;">
+            <!-- Headers -->
+            <div style="text-align: center; padding: 16px; font-weight: 700; font-size: 15px; color: var(--accent-orange); border-bottom: 2px solid rgba(255,145,0,0.2); margin-bottom: 20px;">
+                &#128268; Carregador (CP)
+            </div>
+            <div style="text-align: center; padding: 16px; font-size: 12px; color: var(--text-muted); border-bottom: 2px solid var(--border); margin-bottom: 20px;">
+                OCPP 1.6J
+            </div>
+            <div style="text-align: center; padding: 16px; font-weight: 700; font-size: 15px; color: var(--accent-blue); border-bottom: 2px solid rgba(68,138,255,0.2); margin-bottom: 20px;">
+                &#9881; CSMS (Servidor)
+            </div>
+
+            <!-- BootNotification -->
+            <div style="text-align: right; padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-orange);">BootNotification</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Registra ao ligar</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div style="width: 100%; height: 2px; background: linear-gradient(to right, var(--accent-orange), var(--accent-blue)); position: relative;">
+                    <div style="position: absolute; right: -3px; top: -4px; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid var(--accent-blue);"></div>
+                </div>
+            </div>
+            <div style="padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-blue);">Accepted</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Heartbeat interval</div>
+            </div>
+
+            <!-- Heartbeat -->
+            <div style="text-align: right; padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-orange);">Heartbeat</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Keep-alive periodico</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div style="width: 100%; height: 2px; background: linear-gradient(to right, var(--accent-orange), var(--accent-blue)); position: relative;">
+                    <div style="position: absolute; right: -3px; top: -4px; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid var(--accent-blue);"></div>
+                </div>
+            </div>
+            <div style="padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-blue);">currentTime</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Sincroniza relogio</div>
+            </div>
+
+            <!-- Authorize -->
+            <div style="text-align: right; padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-orange);">Authorize</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Valida ID tag do usuario</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div style="width: 100%; height: 2px; background: linear-gradient(to right, var(--accent-orange), var(--accent-blue)); position: relative;">
+                    <div style="position: absolute; right: -3px; top: -4px; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid var(--accent-blue);"></div>
+                </div>
+            </div>
+            <div style="padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-green);">Accepted</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Usuario autorizado</div>
+            </div>
+
+            <!-- StartTransaction -->
+            <div style="text-align: right; padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-orange);">StartTransaction</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Inicia sessao de recarga</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div style="width: 100%; height: 2px; background: linear-gradient(to right, var(--accent-orange), var(--accent-blue)); position: relative;">
+                    <div style="position: absolute; right: -3px; top: -4px; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid var(--accent-blue);"></div>
+                </div>
+            </div>
+            <div style="padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-blue);">transactionId</div>
+                <div style="font-size: 10px; color: var(--text-muted);">ID da transacao criada</div>
+            </div>
+
+            <!-- MeterValues -->
+            <div style="text-align: right; padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-yellow);">MeterValues</div>
+                <div style="font-size: 10px; color: var(--text-muted);">kWh, V, A, SoC (a cada 30-60s)</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div style="width: 100%; height: 2px; background: linear-gradient(to right, var(--accent-yellow), var(--accent-blue)); position: relative;">
+                    <div style="position: absolute; right: -3px; top: -4px; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid var(--accent-blue);"></div>
+                </div>
+            </div>
+            <div style="padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-blue);">&#8594; Socket.IO</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Broadcast para clientes</div>
+            </div>
+
+            <!-- RemoteStartTransaction (server-initiated) -->
+            <div style="text-align: right; padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-orange);">Accepted</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Aceita comando remoto</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div style="width: 100%; height: 2px; background: linear-gradient(to left, var(--accent-orange), var(--accent-blue)); position: relative;">
+                    <div style="position: absolute; left: -3px; top: -4px; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 8px solid var(--accent-orange);"></div>
+                </div>
+            </div>
+            <div style="padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-blue);">RemoteStart</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Comando do app/dashboard</div>
+            </div>
+
+            <!-- StopTransaction -->
+            <div style="text-align: right; padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-orange);">StopTransaction</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Finaliza + energia total</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div style="width: 100%; height: 2px; background: linear-gradient(to right, var(--accent-orange), var(--accent-blue)); position: relative;">
+                    <div style="position: absolute; right: -3px; top: -4px; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid var(--accent-blue);"></div>
+                </div>
+            </div>
+            <div style="padding: 8px 16px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-green);">Debito wallet</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Calcula custo e debita</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="separator"></div>
+
+<!-- ===== SLIDE 6: DATABASE ===== -->
+<section class="slide" id="database">
+    <div class="slide-number">06 / 09</div>
+    <h2 class="section-title">Modelo de Dados</h2>
+    <p class="section-subtitle">PostgreSQL com TypeORM &mdash; Entidades e relacionamentos principais</p>
+
+    <div class="db-grid">
+        <div class="db-table" style="border-top: 3px solid var(--accent-green);">
+            <div class="db-table-name"><span class="icon">&#128100;</span> users</div>
+            <div class="db-columns">
+                <div class="db-col"><span class="db-col-icon pk-icon"></span> <span class="pk">id</span> <span class="type">uuid PK</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">email</span> <span class="type">varchar UNIQUE</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">password_hash</span> <span class="type">varchar</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">name</span> <span class="type">varchar</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">role</span> <span class="type">enum</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">google_id</span> <span class="type">varchar?</span></div>
+            </div>
+        </div>
+
+        <div class="db-table" style="border-top: 3px solid var(--accent-yellow);">
+            <div class="db-table-name"><span class="icon">&#128176;</span> wallets</div>
+            <div class="db-columns">
+                <div class="db-col"><span class="db-col-icon pk-icon"></span> <span class="pk">id</span> <span class="type">uuid PK</span></div>
+                <div class="db-col"><span class="db-col-icon fk-icon"></span> <span class="fk">userId</span> <span class="type">uuid FK &#8594; users</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">balance</span> <span class="type">decimal</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">currency</span> <span class="type">varchar</span></div>
+            </div>
+        </div>
+
+        <div class="db-table" style="border-top: 3px solid var(--accent-orange);">
+            <div class="db-table-name"><span class="icon">&#128268;</span> charge_points</div>
+            <div class="db-columns">
+                <div class="db-col"><span class="db-col-icon pk-icon"></span> <span class="pk">charge_point_id</span> <span class="type">varchar PK</span></div>
+                <div class="db-col"><span class="db-col-icon fk-icon"></span> <span class="fk">locationId</span> <span class="type">uuid FK &#8594; locations</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">model</span> <span class="type">varchar</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">vendor</span> <span class="type">varchar</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">isConnected</span> <span class="type">boolean</span></div>
+            </div>
+        </div>
+
+        <div class="db-table" style="border-top: 3px solid var(--accent-blue);">
+            <div class="db-table-name"><span class="icon">&#9889;</span> transactions</div>
+            <div class="db-columns">
+                <div class="db-col"><span class="db-col-icon pk-icon"></span> <span class="pk">id</span> <span class="type">uuid PK</span></div>
+                <div class="db-col"><span class="db-col-icon fk-icon"></span> <span class="fk">userId</span> <span class="type">uuid FK &#8594; users</span></div>
+                <div class="db-col"><span class="db-col-icon fk-icon"></span> <span class="fk">chargePointId</span> <span class="type">varchar FK</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">startTime</span> <span class="type">timestamp</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">stopTime</span> <span class="type">timestamp?</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">energy_kwh</span> <span class="type">decimal</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">cost</span> <span class="type">decimal</span></div>
+            </div>
+        </div>
+
+        <div class="db-table" style="border-top: 3px solid var(--accent-purple);">
+            <div class="db-table-name"><span class="icon">&#128205;</span> locations</div>
+            <div class="db-columns">
+                <div class="db-col"><span class="db-col-icon pk-icon"></span> <span class="pk">id</span> <span class="type">uuid PK</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">name</span> <span class="type">varchar</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">address</span> <span class="type">varchar</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">latitude</span> <span class="type">decimal</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">longitude</span> <span class="type">decimal</span></div>
+            </div>
+        </div>
+
+        <div class="db-table" style="border-top: 3px solid var(--accent-cyan);">
+            <div class="db-table-name"><span class="icon">&#128663;</span> vehicles</div>
+            <div class="db-columns">
+                <div class="db-col"><span class="db-col-icon pk-icon"></span> <span class="pk">id</span> <span class="type">uuid PK</span></div>
+                <div class="db-col"><span class="db-col-icon fk-icon"></span> <span class="fk">userId</span> <span class="type">uuid FK &#8594; users</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">make</span> <span class="type">varchar</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">model</span> <span class="type">varchar</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">licensePlate</span> <span class="type">varchar</span></div>
+            </div>
+        </div>
+
+        <div class="db-table" style="border-top: 3px solid var(--accent-pink);">
+            <div class="db-table-name"><span class="icon">&#127915;</span> vouchers</div>
+            <div class="db-columns">
+                <div class="db-col"><span class="db-col-icon pk-icon"></span> <span class="pk">id</span> <span class="type">uuid PK</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">code</span> <span class="type">varchar UNIQUE</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">discountType</span> <span class="type">enum</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">value</span> <span class="type">decimal</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">isActive</span> <span class="type">boolean</span></div>
+            </div>
+        </div>
+
+        <div class="db-table" style="border-top: 3px solid rgba(255,255,255,0.2);">
+            <div class="db-table-name"><span class="icon">&#128276;</span> notifications</div>
+            <div class="db-columns">
+                <div class="db-col"><span class="db-col-icon pk-icon"></span> <span class="pk">id</span> <span class="type">uuid PK</span></div>
+                <div class="db-col"><span class="db-col-icon fk-icon"></span> <span class="fk">userId</span> <span class="type">uuid FK &#8594; users</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">message</span> <span class="type">text</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">type</span> <span class="type">enum</span></div>
+                <div class="db-col"><span class="db-col-icon col-icon"></span> <span class="name">read</span> <span class="type">boolean</span></div>
+            </div>
+        </div>
+
+        <!-- Relationships note -->
+        <div style="grid-column: 1 / -1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px;">
+            <div style="font-size: 13px; font-weight: 600; margin-bottom: 12px;">Relacionamentos Principais</div>
+            <div style="display: flex; gap: 32px; flex-wrap: wrap; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary);">
+                <span><span style="color: var(--accent-green);">users</span> 1:1 <span style="color: var(--accent-yellow);">wallets</span></span>
+                <span><span style="color: var(--accent-green);">users</span> 1:N <span style="color: var(--accent-cyan);">vehicles</span></span>
+                <span><span style="color: var(--accent-green);">users</span> 1:N <span style="color: var(--accent-blue);">transactions</span></span>
+                <span><span style="color: var(--accent-purple);">locations</span> 1:N <span style="color: var(--accent-orange);">charge_points</span></span>
+                <span><span style="color: var(--accent-orange);">charge_points</span> 1:N <span style="color: var(--accent-blue);">transactions</span></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="separator"></div>
+
+<!-- ===== SLIDE 7: AUTH FLOW ===== -->
+<section class="slide" id="auth">
+    <div class="slide-number">07 / 09</div>
+    <h2 class="section-title">Fluxo de Autenticacao</h2>
+    <p class="section-subtitle">JWT + Google OAuth com refresh automatico e controle de acesso baseado em roles</p>
+
+    <div class="auth-grid">
+        <div class="auth-panel" style="border-top: 3px solid var(--accent-green);">
+            <div class="auth-panel-title">
+                <span>&#128241;</span> Mobile App (NeoPower)
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">1</div>
+                <div class="auth-step-text">Usuario toca <strong>"Entrar com Google"</strong> na LoginScreen</div>
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">2</div>
+                <div class="auth-step-text"><strong>GoogleSignin.signIn()</strong> retorna idToken do Google</div>
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">3</div>
+                <div class="auth-step-text">POST <strong>/users/google-auth</strong> com o idToken</div>
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">4</div>
+                <div class="auth-step-text">Backend valida com Google, cria/busca usuario, retorna <strong>JWT access + refresh tokens</strong></div>
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">5</div>
+                <div class="auth-step-text">Tokens salvos no <strong>Expo SecureStore</strong> (criptografado)</div>
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">6</div>
+                <div class="auth-step-text">Axios interceptor adiciona <strong>Authorization: Bearer</strong> em todas as requisicoes. Em 401, auto-refresh do token.</div>
+            </div>
+        </div>
+
+        <div class="auth-panel" style="border-top: 3px solid var(--accent-purple);">
+            <div class="auth-panel-title">
+                <span>&#128187;</span> Dashboard Web (NeoRBAC)
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">1</div>
+                <div class="auth-step-text">Admin acessa pagina de <strong>Login</strong></div>
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">2</div>
+                <div class="auth-step-text">POST <strong>/users/login</strong> com email + senha</div>
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">3</div>
+                <div class="auth-step-text">Backend retorna JWT com <strong>role (ADMIN, ATEM, COMUM)</strong></div>
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">4</div>
+                <div class="auth-step-text">Token armazenado em <strong>localStorage</strong></div>
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">5</div>
+                <div class="auth-step-text">api.ts wrapper inclui token em todas as <strong>fetch requests</strong></div>
+            </div>
+            <div class="auth-step">
+                <div class="auth-step-num">6</div>
+                <div class="auth-step-text">Session timeout de <strong>30 minutos</strong> de inatividade. Redirect para login em 401.</div>
+            </div>
+        </div>
+
+        <div class="auth-panel full-width" style="grid-column: 1 / -1; border-top: 3px solid var(--accent-blue);">
+            <div class="auth-panel-title">
+                <span>&#128274;</span> Roles & Permissoes (RBAC)
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                <div style="background: rgba(255,64,129,0.05); border: 1px solid rgba(255,64,129,0.1); border-radius: 10px; padding: 20px;">
+                    <div style="font-size: 14px; font-weight: 700; color: var(--accent-pink); margin-bottom: 10px;">ADMIN</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                        Acesso total ao sistema<br>
+                        Gerenciar usuarios e roles<br>
+                        Configurar tarifas<br>
+                        Gestao financeira completa<br>
+                        Enviar campanhas push
+                    </div>
+                </div>
+                <div style="background: rgba(255,145,0,0.05); border: 1px solid rgba(255,145,0,0.1); border-radius: 10px; padding: 20px;">
+                    <div style="font-size: 14px; font-weight: 700; color: var(--accent-orange); margin-bottom: 10px;">ATEM (Operador)</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                        Monitorar carregadores<br>
+                        Enviar comandos remotos<br>
+                        Visualizar transacoes<br>
+                        Gerenciar localizacoes<br>
+                        Criar vouchers
+                    </div>
+                </div>
+                <div style="background: rgba(0,230,118,0.05); border: 1px solid rgba(0,230,118,0.1); border-radius: 10px; padding: 20px;">
+                    <div style="font-size: 14px; font-weight: 700; color: var(--accent-green); margin-bottom: 10px;">COMUM (Usuario)</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                        Iniciar/parar recargas<br>
+                        Gerenciar carteira<br>
+                        Cadastrar veiculos<br>
+                        Visualizar historico<br>
+                        Resgatar vouchers
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="separator"></div>
+
+<!-- ===== SLIDE 8: REAL-TIME ===== -->
+<section class="slide" id="realtime">
+    <div class="slide-number">08 / 09</div>
+    <h2 class="section-title">Comunicacao em Tempo Real</h2>
+    <p class="section-subtitle">Socket.IO conecta carregadores, backend e clientes em um fluxo bidirecional continuo</p>
+
+    <div class="events-grid">
+        <div class="event-card" style="border-top: 2px solid var(--accent-green);">
+            <div class="event-direction broadcast">BROADCAST</div>
+            <div class="event-name" style="color: var(--accent-green);">charger_connected</div>
+            <div class="event-desc">Emitido quando um carregador faz BootNotification. Mobile e dashboard atualizam status em tempo real.</div>
+        </div>
+        <div class="event-card" style="border-top: 2px solid var(--accent-pink);">
+            <div class="event-direction broadcast">BROADCAST</div>
+            <div class="event-name" style="color: var(--accent-pink);">charger_disconnected</div>
+            <div class="event-desc">Emitido quando a conexao WebSocket do carregador cai. Alerta operadores imediatamente.</div>
+        </div>
+        <div class="event-card" style="border-top: 2px solid var(--accent-yellow);">
+            <div class="event-direction broadcast">BROADCAST</div>
+            <div class="event-name" style="color: var(--accent-yellow);">meter_values</div>
+            <div class="event-desc">Dados de medicao em tempo real: potencia (kW), tensao (V), corrente (A), SoC (%). Atualiza a cada 30-60s.</div>
+        </div>
+        <div class="event-card" style="border-top: 2px solid var(--accent-blue);">
+            <div class="event-direction broadcast">BROADCAST</div>
+            <div class="event-name" style="color: var(--accent-blue);">status_notification</div>
+            <div class="event-desc">Mudanca de status do conector: Available, Preparing, Charging, Finishing, Faulted.</div>
+        </div>
+        <div class="event-card" style="border-top: 2px solid var(--accent-purple);">
+            <div class="event-direction broadcast">BROADCAST</div>
+            <div class="event-name" style="color: var(--accent-purple);">transaction_updated</div>
+            <div class="event-desc">Progresso da sessao de recarga: energia consumida, custo parcial, tempo decorrido.</div>
+        </div>
+        <div class="event-card" style="border-top: 2px solid var(--accent-cyan);">
+            <div class="event-direction broadcast">BROADCAST</div>
+            <div class="event-name" style="color: var(--accent-cyan);">wallet_updated</div>
+            <div class="event-desc">Saldo do usuario atualizado apos deposito, cobranca de recarga ou resgate de voucher.</div>
+        </div>
+    </div>
+
+    <div style="max-width: 1100px; margin: 40px auto 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 32px;">
+        <div style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Fluxo de Dados em Tempo Real</div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 12px;">
+            <div style="background: rgba(255,145,0,0.1); color: var(--accent-orange); padding: 10px 18px; border-radius: 8px; font-weight: 600;">Carregador</div>
+            <span style="color: var(--text-muted);">&#8594; OCPP 1.6J &#8594;</span>
+            <div style="background: rgba(68,138,255,0.1); color: var(--accent-blue); padding: 10px 18px; border-radius: 8px; font-weight: 600;">ocppServer.ts</div>
+            <span style="color: var(--text-muted);">&#8594; processa &#8594;</span>
+            <div style="background: rgba(124,77,255,0.1); color: var(--accent-purple); padding: 10px 18px; border-radius: 8px; font-weight: 600;">socketService.ts</div>
+            <span style="color: var(--text-muted);">&#8594; emit &#8594;</span>
+            <div style="background: rgba(0,230,118,0.1); color: var(--accent-green); padding: 10px 18px; border-radius: 8px; font-weight: 600;">App + Dashboard</div>
+        </div>
+    </div>
+</section>
+
+<div class="separator"></div>
+
+<!-- ===== SLIDE 9: TECH STACK ===== -->
+<section class="slide" id="stack">
+    <div class="slide-number">09 / 09</div>
+    <h2 class="section-title">Stack Tecnologico</h2>
+    <p class="section-subtitle">Todas as tecnologias utilizadas no ecossistema NeoPower</p>
+
+    <div class="stack-grid">
+        <div class="stack-category" style="border-top: 3px solid var(--accent-green);">
+            <div class="stack-cat-title">Frontend Mobile</div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-green);"></span><span class="stack-item-name">React Native</span><span class="stack-item-ver">0.81</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-green);"></span><span class="stack-item-name">Expo</span><span class="stack-item-ver">54.0</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-green);"></span><span class="stack-item-name">TypeScript</span><span class="stack-item-ver">5.9</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-green);"></span><span class="stack-item-name">NativeWind</span><span class="stack-item-ver">4.1</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-green);"></span><span class="stack-item-name">React Navigation</span><span class="stack-item-ver">7.x</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-green);"></span><span class="stack-item-name">Axios</span><span class="stack-item-ver">1.13</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-green);"></span><span class="stack-item-name">RN Maps</span><span class="stack-item-ver">1.20</span></div>
+        </div>
+
+        <div class="stack-category" style="border-top: 3px solid var(--accent-blue);">
+            <div class="stack-cat-title">Backend</div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-blue);"></span><span class="stack-item-name">Node.js</span><span class="stack-item-ver">20+</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-blue);"></span><span class="stack-item-name">Express</span><span class="stack-item-ver">5.x</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-blue);"></span><span class="stack-item-name">TypeORM</span><span class="stack-item-ver">0.3</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-blue);"></span><span class="stack-item-name">Socket.IO</span><span class="stack-item-ver">4.8</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-blue);"></span><span class="stack-item-name">ocpp-rpc</span><span class="stack-item-ver">2.2</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-blue);"></span><span class="stack-item-name">Zod</span><span class="stack-item-ver">3.x</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-blue);"></span><span class="stack-item-name">Winston</span><span class="stack-item-ver">3.14</span></div>
+        </div>
+
+        <div class="stack-category" style="border-top: 3px solid var(--accent-purple);">
+            <div class="stack-cat-title">Frontend Web</div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-purple);"></span><span class="stack-item-name">React</span><span class="stack-item-ver">18.2</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-purple);"></span><span class="stack-item-name">Vite</span><span class="stack-item-ver">7.2</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-purple);"></span><span class="stack-item-name">Tailwind CSS</span><span class="stack-item-ver">3.4</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-purple);"></span><span class="stack-item-name">Shadcn/UI</span><span class="stack-item-ver">latest</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-purple);"></span><span class="stack-item-name">Leaflet</span><span class="stack-item-ver">1.9</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-purple);"></span><span class="stack-item-name">Recharts</span><span class="stack-item-ver">2.15</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-purple);"></span><span class="stack-item-name">React Hook Form</span><span class="stack-item-ver">7.x</span></div>
+        </div>
+
+        <div class="stack-category" style="border-top: 3px solid var(--accent-pink);">
+            <div class="stack-cat-title">Infra & Servicos</div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-pink);"></span><span class="stack-item-name">PostgreSQL</span><span class="stack-item-ver">14+</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-pink);"></span><span class="stack-item-name">JWT</span><span class="stack-item-ver">9.x</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-pink);"></span><span class="stack-item-name">Google Auth</span><span class="stack-item-ver">OAuth 2.0</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-pink);"></span><span class="stack-item-name">MercadoPago</span><span class="stack-item-ver">SDK</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-pink);"></span><span class="stack-item-name">Expo Push</span><span class="stack-item-ver">SDK</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-pink);"></span><span class="stack-item-name">Web Push</span><span class="stack-item-ver">API</span></div>
+            <div class="stack-item"><span class="stack-item-dot" style="background: var(--accent-pink);"></span><span class="stack-item-name">TLS/mTLS</span><span class="stack-item-ver">X.509</span></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--border);">
+        <div style="font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px;">
+            <span style="background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">NeoPower</span>
+        </div>
+        <div style="font-size: 14px; color: var(--text-muted);">Plataforma de Recarga de Veiculos Eletricos</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">OCPP 1.6J &bull; Real-time Monitoring &bull; Mobile + Web</div>
+    </div>
+</section>
+
+<script>
+    // Intersection Observer for fade-in animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Active nav link
+    const sections = document.querySelectorAll('.slide[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            if (window.scrollY >= sectionTop) {
+                current = section.getAttribute('id');
+            }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
